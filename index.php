@@ -1,10 +1,4 @@
 <?php
-
-$options = array(
-    // which string should represent a tab for indentation
-    'tabsize' => 4,
-);
-
 /**
  * PHP Console
  *
@@ -22,15 +16,36 @@ if (!in_array($_SERVER['REMOTE_ADDR'], array('127.0.0.1', '::1'), true)) {
     header('HTTP/1.1 401 Access unauthorized');
     die('ERR/401 Go Away');
 }
+ini_set('log_errors', 0);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL | E_STRICT);
 
+// Parse the contents of the config.json file as an associative array.
+$config = json_decode(file_get_contents('config.json'), TRUE);
+$options = $config['options'];
 define('PHP_CONSOLE_VERSION', '1.3.0-dev');
 require 'krumo/class.krumo.php';
 
-ini_set('log_errors', 0);
-ini_set('display_errors', 1);
-error_reporting(E_ALL | E_STRICT);
-
 $debugOutput = '';
+
+/**
+ * Bootstrap a drupal site
+ */
+
+$current_site = !empty($_SESSION['current_site']) ? $_SESSION['current_site'] : NULL;
+if (!$current_site && !empty($drupal_sites)){
+  $current_site = key($drupal_sites);
+}
+if($current_site) {
+  // We must be actually in the root directory of Drupal installation.
+  chdir($current_site);
+  define('DONSOLE', TRUE);
+
+  define('DRUPAL_ROOT', getcwd());
+  require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
+  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+}
 
 if (isset($_POST['code'])) {
     if (get_magic_quotes_gpc()) {

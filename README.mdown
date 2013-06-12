@@ -3,6 +3,8 @@ PHP Console
 
 A web console to try your PHP code into
 
+Also you can add the root folder of a drupal site to the config file, and the console will fully bootstrap that drupal install, giving you access to the sites database and all the installed modules.
+
 Creating a test file or using php's interactive mode can be a bit cumbersome to try random php snippets. This allows you to run small bits of code easily right from your browser.
 
 It is secure since accessible only from the local host, and very easy to setup and use.
@@ -29,6 +31,13 @@ Author
 
 Jordi Boggiano - <j.boggiano@seld.be><br />
 <http://seld.be/> - <http://twitter.com/seldaek>
+
+Minor amends to the original code to bootstrap Drupal
+-----------------------------------------------------
+
+Neil Delargy - <n.delargy@ctidigital.com><br />
+<https://github.com/ndelargy/drupal-php-console>
+
 
 Changelog
 ---------
