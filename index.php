@@ -34,7 +34,8 @@ $debugOutput = '';
  */
 
 $current_site = !empty($_SESSION['current_site']) ? $_SESSION['current_site'] : NULL;
-if (!$current_site && !empty($drupal_sites)){
+if (!$current_site && !empty($config['drupal_sites'])){
+  $drupal_sites = $config['drupal_sites'];
   $current_site = key($drupal_sites);
 }
 if($current_site) {
@@ -87,7 +88,7 @@ if (isset($_POST['code'])) {
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>Debug Console</title>
+        <title><?php print empty($drupal_sites[$current_site]) ? '' : $drupal_sites[$current_site] . ' - '; ?>Debug Console</title>
         <link rel="stylesheet" type="text/css" href="styles.css" />
         <script src="jquery-1.9.1.min.js"></script>
         <script src="ace/ace.js" charset="utf-8"></script>

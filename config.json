@@ -3,6 +3,6 @@
     "tabsize":4
   },
   "drupal_sites": {
-    "/var/www/drupal/hav002/":"Peugeot"
+    "/var/www/drupal/hav002/site":"Peugeot"
   }
 }
