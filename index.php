@@ -149,7 +149,10 @@ if (isset($_POST['code'])) {
         <link href="favicon.ico" rel="icon" type="image/x-icon" />
     </head>
     <body>
+        
+        <?php if(!empty($debugOutout)) : ?>
         <div class="output"><?php echo $debugOutput ?></div>
+        <?php endif; ?>
         <form method="POST" action="">
             <div class="input">
                 <textarea class="editor" id="editor" name="code"><?php echo (isset($_POST['code']) ? htmlentities($_POST['code'], ENT_QUOTES, 'UTF-8') : "&lt;?php\n\n") ?></textarea>
