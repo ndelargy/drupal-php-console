@@ -26,17 +26,19 @@ error_reporting(E_ALL | E_STRICT);
 $config = json_decode(file_get_contents('default.config.json'), TRUE);
 
 if (is_readable('my.config.json')) {
-
   // Append values of custom configuration to default values
   $customConfig = json_decode(file_get_contents('my.config.json'), TRUE);
-  foreach($customConfig['options'] as $key => $val) {
-    $config['options'][$key] = $val;
+
+  if(isset($config['options']) && isset($customConfig['options'])) {
+    $config['options'] = $customConfig['options'] + $config['options'];
+  } else if(!isset($config['options']) && isset($customConfig['options'])) {
+    $config['options'] = $customConfig['options'];
   }
 
-  if(!empty($customConfig['drupal_sites'])) {
-    foreach($customConfig['drupal_sites'] as $key => $val) {
-      $config['drupal_sites'][$key] = $val;
-    }
+  if(isset($config['drupal_sites']) && isset($customConfig['drupal_sites'])) {
+    $config['drupal_sites'] = $customConfig['drupal_sites'] + $config['drupal_sites'];
+  } else if(!isset($config['drupal_sites']) && isset($customConfig['drupal_sites'])) {
+    $config['drupal_sites'] = $customConfig['drupal_sites'];
   }
 }
 
@@ -50,11 +52,16 @@ $debugOutput = '';
  * Bootstrap a drupal site
  */
 if (isset($_POST['site'])) {
-  if (!in_array($_POST['site'], array_keys($config['drupal_sites']))) {
+  if (in_array($_POST['site'], array_keys($config['drupal_sites']))) {
+    setcookie('current_site', $_POST['site']);
+    exit('OK');
+  }
+  else {
     header('HTTP/1.1 500 Internal Server Error');
     exit('Requested site not defined in the config');
   }
 }
+
 
 $current_site = !empty($_COOKIE['current_site']) ? $_COOKIE['current_site'] : NULL;
 
@@ -150,9 +157,7 @@ if (isset($_POST['code'])) {
     </head>
     <body>
         
-        <?php if(!empty($debugOutout)) : ?>
         <div class="output"><?php echo $debugOutput ?></div>
-        <?php endif; ?>
         <form method="POST" action="">
             <div class="input">
                 <textarea class="editor" id="editor" name="code"><?php echo (isset($_POST['code']) ? htmlentities($_POST['code'], ENT_QUOTES, 'UTF-8') : "&lt;?php\n\n") ?></textarea>
