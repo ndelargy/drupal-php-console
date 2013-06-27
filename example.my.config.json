@@ -1,0 +1,8 @@
+{
+  "options":{
+    "tabsize":2
+  },
+  "drupal_sites": {
+    "/var/www/mysite":"My Website"
+  }
+}

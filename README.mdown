@@ -21,6 +21,8 @@ Setup
 
 Clone the git repo or download it as a zip/tarball, drop it somewhere in your local web document root and access it with http://localhost/path/to/php-console
 
+Copy rename "example.my.config.json" to "my.config.json" and edit as required 
+
 Contributing
 ------------
 
