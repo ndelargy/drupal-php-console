@@ -12,6 +12,7 @@
  *
  * Source on Github http://github.com/Seldaek/php-console
  */
+
 if (!in_array($_SERVER['REMOTE_ADDR'], array('127.0.0.1', '::1'), true)) {
     header('HTTP/1.1 401 Access unauthorized');
     die('ERR/401 Go Away');
@@ -22,7 +23,10 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL | E_STRICT);
 
 // Parse the contents of the config.json file as an associative array.
-$config = json_decode(file_get_contents('config.json'), TRUE);
+$config = json_decode(file_get_contents('default.config.json'), TRUE);
+if (is_readable('my.config.json')) {
+  $config = json_decode(file_get_contents('my.config.json'), TRUE);
+}
 $options = $config['options'];
 define('PHP_CONSOLE_VERSION', '1.3.0-dev');
 require 'krumo/class.krumo.php';
@@ -32,12 +36,25 @@ $debugOutput = '';
 /**
  * Bootstrap a drupal site
  */
+if (isset($_POST['site'])) {
+  if (in_array($_POST['site'], array_keys($config['drupal_sites']))) {
+    setcookie('current_site', $_POST['site']);
+    exit('OK');
+  }
+  else {
+    header('HTTP/1.1 500 Internal Server Error');
+    exit('Requested site not defined in the config');
+  }
+}
 
-$current_site = !empty($_SESSION['current_site']) ? $_SESSION['current_site'] : NULL;
+$current_site = !empty($_COOKIE['current_site']) ? $_COOKIE['current_site'] : NULL;
+
 if (!$current_site && !empty($config['drupal_sites'])){
   $drupal_sites = $config['drupal_sites'];
   $current_site = key($drupal_sites);
+  setcookie('current_site', $current_site);
 }
+
 if($current_site) {
   // We must be actually in the root directory of Drupal installation.
   chdir($current_site);
@@ -48,10 +65,27 @@ if($current_site) {
   drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
 }
 
+if (!session_id()){
+  session_start();
+}
+if (!isset($_SESSION['history'])) {
+  $_SESSION['history'] = array();
+}
+if (isset($_GET['h'])){
+  $h = (int) $_GET['h'];
+  if(empty($_SESSION['history'][$h])) {
+    header('HTTP/1.1 500 Internal Server Error');
+    exit('History state not found');
+  }
+  exit($_SESSION['history'][$h]);
+}
 if (isset($_POST['code'])) {
     if (get_magic_quotes_gpc()) {
         $code = stripslashes($code);
     }
+    
+    //$_SESSION['history'] = array_slice($_SESSION['history'], -10, 10);
+    $_SESSION['history'][] = $_POST['code'];
 
     $code = trim(preg_replace('{^\s*<\?(php)?}i', '', $_POST['code']));
 
@@ -78,6 +112,7 @@ if (isset($_POST['code'])) {
     if (isset($_GET['js'])) {
         header('Content-Type: text/plain');
         echo $debugOutput;
+        session_write_close();
         die('#end-php-console-output#');
     }
 }
@@ -88,7 +123,7 @@ if (isset($_POST['code'])) {
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title><?php print empty($drupal_sites[$current_site]) ? '' : $drupal_sites[$current_site] . ' - '; ?>Debug Console</title>
+        <title>DBG - <?php print empty($drupal_sites[$current_site]) ? '' : $drupal_sites[$current_site] . ' - '; ?>Debug Console</title>
         <link rel="stylesheet" type="text/css" href="styles.css" />
         <script src="jquery-1.9.1.min.js"></script>
         <script src="ace/ace.js" charset="utf-8"></script>
@@ -99,6 +134,7 @@ if (isset($_POST['code'])) {
                 tabsize: <?php echo json_encode($options['tabsize']) ?>
             });
         </script>
+        <link href="favicon.ico" rel="icon" type="image/x-icon" />
     </head>
     <body>
         <div class="output"><?php echo $debugOutput ?></div>
@@ -138,6 +174,10 @@ if (isset($_POST['code'])) {
             krumo(foo());
         </div>
         <div class="help">
+        misc:
+            press ctrl-enter to submit
+            put '#\n' on the first line to enforce
+                \n line breaks (\r\n etc work too)
         commands:
             krumo::backtrace();
             krumo::includes();
@@ -146,10 +186,22 @@ if (isset($_POST['code'])) {
             krumo::defines();
         </div>
         <div class="help">
-        misc:
-            press ctrl-enter to submit
-            put '#\n' on the first line to enforce
-                \n line breaks (\r\n etc work too)
+          <div id="site-chooser">
+            <label for="site-choice"></label>
+            <select name="site-choice" id="site-choice">
+              <?php foreach ( $config['drupal_sites'] as $dir => $site ) : ?>
+              <?php $site_selected_option = $dir === $current_site ? ' selected="selected"' : ''; ?>
+              <option<?php print $site_selected_option; ?>
+                value="<?php print $dir; ?>"><?php print $site; ?></option>
+              <?php endforeach; ?>
+            </select>
+            <div id="history">
+            <?php foreach ( $_SESSION['history'] as $k => $h_code ) : ?>
+              <a href="?js=1&h=<?php print $k; ?>">back <?php print $k; ?></a>
+            <?php endforeach; ?>
+            </div>
+          </div>
+
         </div>
         <div class="footer">
             php-console v<?php echo PHP_CONSOLE_VERSION ?> - by <a href="http://seld.be/">Jordi Boggiano</a> - <a href="http://github.com/Seldaek/php-console">sources on github</a>

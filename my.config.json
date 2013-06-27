@@ -1,0 +1,9 @@
+{
+  "options":{
+    "tabsize":2
+  },
+  "drupal_sites": {
+    "/var/www/drupal/bri002/site":"British Council - bri002",
+    "/var/www/drupal/hav002/site":"Peugeot - hav002"
+  }
+}

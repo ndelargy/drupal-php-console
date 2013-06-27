@@ -24,10 +24,10 @@
     /**
      * updates the text of the status bar
      */
-    updateStatusBar = function(e) {
+    var updateStatusBar = function(e) {
         var cursor_position = editor.getCursorPosition();
         $('.statusbar .position').text('Line: ' + (1+cursor_position.row) + ', Column: ' + cursor_position.column);
-    };
+    },
 
     /**
      * prepares a clippy button for clipboard access
@@ -41,7 +41,7 @@
         $('#clippy embed').attr('FlashVars', 'text=' + selection);
         $('#clippy param[name="FlashVars"]').attr('value', 'text=' + selection);
         $('.statusbar .copy').html($('.statusbar .copy').html()).show();
-    };
+    },
 
     /**
      * adds a toggle button to expand/collapse all krumo sub-trees at once
@@ -57,24 +57,37 @@
                 })
                 .prependTo('.output');
         }
-    };
+    },
 
     /**
      * does an async request to eval the php code and displays the result
      */
     handleSubmit = function(e) {
-        e.preventDefault();
-        $('div.output').html('<img src="loader.gif" class="loader" alt="" /> Loading ...');
-
-        $.post('?js=1', { code: editor.getSession().getValue() }, function(res) {
+       function consoleResponseHandler(res) {
             if (res.match(/#end-php-console-output#$/)) {
                 $('div.output').html(res.substring(0, res.length-24));
             } else {
                 $('div.output').html(res + "<br /><br /><em>Script ended unexpectedly.</em>");
             }
             refreshKrumoState();
+        }
+
+        function consoleErrorHandler(jqXHR, textStatus, errorThrown){
+          console.log('called');
+          $('div.output').html(errorThrown + "<br /><br /><em>Script ended unexpectedly.</em>");
+        }
+
+        e.preventDefault();
+        $('div.output').html('<img src="loader.gif" class="loader" alt="" /> Loading ...');
+
+        $.ajax({
+          type: "POST",
+          url: '?js=1',
+          data: { code: editor.getSession().getValue() },
+          success: consoleResponseHandler,
+          error: consoleErrorHandler
         });
-    };
+    },
 
     initializeAce = function() {
         var PhpMode, code;
@@ -113,6 +126,31 @@
                 $('form').submit();
             }
         });
+    },
+
+    initializeSiteChooser = function(){
+      var $chooser = $('#site-choice'),
+          total_sites = $chooser.find('option').length;
+      // If there's no site config or only one choice hide it.
+      if ( total_sites < 2 ) {
+        $chooser.hide();
+      }
+      if ( total_sites == 1 ) {
+        $chooser.after('Debugging <strong>' + $chooser.find('option').html() + '</strong>');
+      }
+      // If there's only one site in the config
+      $chooser.on('change', function(){
+        $.post('?js=1', {"site":this.value}, function(){
+          document.title = 'DBG - ' + $chooser.find('option:selected').html()
+        });
+      });
+    },
+
+    initializeSessionHistory = function(){
+      var $history = $('#history');
+      $history.on('click', 'a', function(e){
+        e.preventDefault();
+      });
     };
 
     $.console = function(settings) {
@@ -120,7 +158,8 @@
 
         $(function() {
             $(document).ready(initializeAce);
-
+            $(document).ready(initializeSiteChooser);
+            $(document).ready(initializeSessionHistory);
             $('form').submit(handleSubmit);
         });
     };
