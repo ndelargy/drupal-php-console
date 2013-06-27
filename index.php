@@ -24,9 +24,22 @@ error_reporting(E_ALL | E_STRICT);
 
 // Parse the contents of the config.json file as an associative array.
 $config = json_decode(file_get_contents('default.config.json'), TRUE);
+
 if (is_readable('my.config.json')) {
-  $config = json_decode(file_get_contents('my.config.json'), TRUE);
+
+  // Append values of custom configuration to default values
+  $customConfig = json_decode(file_get_contents('my.config.json'), TRUE);
+  foreach($customConfig['options'] as $key => $val) {
+    $config['options'][$key] = $val;
+  }
+
+  if(!empty($customConfig['drupal_sites'])) {
+    foreach($customConfig['drupal_sites'] as $key => $val) {
+      $config['drupal_sites'][$key] = $val;
+    }
+  }
 }
+
 $options = $config['options'];
 define('PHP_CONSOLE_VERSION', '1.3.0-dev');
 require 'krumo/class.krumo.php';
@@ -37,11 +50,7 @@ $debugOutput = '';
  * Bootstrap a drupal site
  */
 if (isset($_POST['site'])) {
-  if (in_array($_POST['site'], array_keys($config['drupal_sites']))) {
-    setcookie('current_site', $_POST['site']);
-    exit('OK');
-  }
-  else {
+  if (!in_array($_POST['site'], array_keys($config['drupal_sites']))) {
     header('HTTP/1.1 500 Internal Server Error');
     exit('Requested site not defined in the config');
   }
@@ -52,10 +61,9 @@ $current_site = !empty($_COOKIE['current_site']) ? $_COOKIE['current_site'] : NU
 if (!$current_site && !empty($config['drupal_sites'])){
   $drupal_sites = $config['drupal_sites'];
   $current_site = key($drupal_sites);
-  setcookie('current_site', $current_site);
 }
 
-if($current_site) {
+if(isset($current_site) && file_exists($current_site)) {
   // We must be actually in the root directory of Drupal installation.
   chdir($current_site);
   define('DONSOLE', TRUE);
@@ -63,6 +71,10 @@ if($current_site) {
   define('DRUPAL_ROOT', getcwd());
   require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
   drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+  setcookie('current_site', $current_site);
+} else {
+  header('HTTP/1.1 500 Internal Server Error');
+  exit('Requested site cannot be found at ' . $current_site);
 }
 
 if (!session_id()){
