@@ -24,9 +24,24 @@ error_reporting(E_ALL | E_STRICT);
 
 // Parse the contents of the config.json file as an associative array.
 $config = json_decode(file_get_contents('default.config.json'), TRUE);
+
 if (is_readable('my.config.json')) {
-  $config = json_decode(file_get_contents('my.config.json'), TRUE);
+  // Append values of custom configuration to default values
+  $customConfig = json_decode(file_get_contents('my.config.json'), TRUE);
+
+  if(isset($config['options']) && isset($customConfig['options'])) {
+    $config['options'] = $customConfig['options'] + $config['options'];
+  } else if(!isset($config['options']) && isset($customConfig['options'])) {
+    $config['options'] = $customConfig['options'];
+  }
+
+  if(isset($config['drupal_sites']) && isset($customConfig['drupal_sites'])) {
+    $config['drupal_sites'] = $customConfig['drupal_sites'] + $config['drupal_sites'];
+  } else if(!isset($config['drupal_sites']) && isset($customConfig['drupal_sites'])) {
+    $config['drupal_sites'] = $customConfig['drupal_sites'];
+  }
 }
+
 $options = $config['options'];
 define('PHP_CONSOLE_VERSION', '1.3.0-dev');
 require 'krumo/class.krumo.php';
@@ -47,15 +62,15 @@ if (isset($_POST['site'])) {
   }
 }
 
+
 $current_site = !empty($_COOKIE['current_site']) ? $_COOKIE['current_site'] : NULL;
 
 if (!$current_site && !empty($config['drupal_sites'])){
   $drupal_sites = $config['drupal_sites'];
   $current_site = key($drupal_sites);
-  setcookie('current_site', $current_site);
 }
 
-if($current_site) {
+if(isset($current_site) && file_exists($current_site)) {
   // We must be actually in the root directory of Drupal installation.
   chdir($current_site);
   define('DONSOLE', TRUE);
@@ -63,6 +78,10 @@ if($current_site) {
   define('DRUPAL_ROOT', getcwd());
   require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
   drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+  setcookie('current_site', $current_site);
+} else {
+  header('HTTP/1.1 500 Internal Server Error');
+  exit('Requested site cannot be found at ' . $current_site);
 }
 
 if (!session_id()){
@@ -137,6 +156,7 @@ if (isset($_POST['code'])) {
         <link href="favicon.ico" rel="icon" type="image/x-icon" />
     </head>
     <body>
+        
         <div class="output"><?php echo $debugOutput ?></div>
         <form method="POST" action="">
             <div class="input">
