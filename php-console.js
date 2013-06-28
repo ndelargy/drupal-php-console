@@ -73,7 +73,6 @@
         }
 
         function consoleErrorHandler(jqXHR, textStatus, errorThrown){
-          console.log('called');
           $('div.output').html(errorThrown + "<br /><br /><em>Script ended unexpectedly.</em>");
         }
 
@@ -146,10 +145,15 @@
       });
     },
 
-    initializeSessionHistory = function(){
+    initializeHistory = function(){
       var $history = $('#history');
       $history.on('click', 'a', function(e){
         e.preventDefault();
+        $.get(this.href, function(data){
+          $('#' + options.editor).text(data);
+          initializeAce();
+        });
+        
       });
     };
 
@@ -159,7 +163,7 @@
         $(function() {
             $(document).ready(initializeAce);
             $(document).ready(initializeSiteChooser);
-            $(document).ready(initializeSessionHistory);
+            $(document).ready(initializeHistory);
             $('form').submit(handleSubmit);
         });
     };
