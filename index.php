@@ -22,27 +22,25 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL | E_STRICT);
 
-// Parse the contents of the config.json file as an associative array.
+// Parse the contents of the default.config.json file as an associative array.
 $config = json_decode(file_get_contents('default.config.json'), TRUE);
+if (!$config) {
+  print 'Config error in default.config.json';
+}
 
 if (is_readable('my.config.json')) {
   // Append values of custom configuration to default values
   $customConfig = json_decode(file_get_contents('my.config.json'), TRUE);
-
-  if(isset($config['options']) && isset($customConfig['options'])) {
-    $config['options'] = $customConfig['options'] + $config['options'];
-  } else if(!isset($config['options']) && isset($customConfig['options'])) {
-    $config['options'] = $customConfig['options'];
+  if ($customConfig) {
+    $config = $customConfig ? $customConfig + $config : $config;
   }
-
-  if(isset($config['drupal_sites']) && isset($customConfig['drupal_sites'])) {
-    $config['drupal_sites'] = $customConfig['drupal_sites'] + $config['drupal_sites'];
-  } else if(!isset($config['drupal_sites']) && isset($customConfig['drupal_sites'])) {
-    $config['drupal_sites'] = $customConfig['drupal_sites'];
+  else if(file_get_contents('my.config.json')) {
+    print 'Config error in my.config.json';
   }
 }
+$drupal_sites = !empty($config['drupal_sites']) ? $config['drupal_sites'] : array();
+$options = !empty($config['options']) ? $config['options'] : array();
 
-$options = $config['options'];
 define('PHP_CONSOLE_VERSION', '1.3.0-dev');
 require 'krumo/class.krumo.php';
 
@@ -62,11 +60,9 @@ if (isset($_POST['site'])) {
   }
 }
 
-
 $current_site = !empty($_COOKIE['current_site']) ? $_COOKIE['current_site'] : NULL;
 
-if (!$current_site && !empty($config['drupal_sites'])){
-  $drupal_sites = $config['drupal_sites'];
+if (!$current_site && !empty($drupal_sites)){
   $current_site = key($drupal_sites);
 }
 
@@ -84,29 +80,30 @@ if(isset($current_site) && file_exists($current_site)) {
   exit('Requested site cannot be found at ' . $current_site);
 }
 
-if (!session_id()){
-  session_start();
-}
-if (!isset($_SESSION['history'])) {
-  $_SESSION['history'] = array();
-}
+$history = isset($_COOKIE['history']) ? unserialize($_COOKIE['history']) : array();
+
 if (isset($_GET['h'])){
   $h = (int) $_GET['h'];
-  if(empty($_SESSION['history'][$h])) {
+  if(empty($history[$h])) {
     header('HTTP/1.1 500 Internal Server Error');
     exit('History state not found');
   }
-  exit($_SESSION['history'][$h]);
+
+  exit("<?php\n\n" . $history[$h]);
 }
 if (isset($_POST['code'])) {
     if (get_magic_quotes_gpc()) {
         $code = stripslashes($code);
     }
     
-    //$_SESSION['history'] = array_slice($_SESSION['history'], -10, 10);
-    $_SESSION['history'][] = $_POST['code'];
-
     $code = trim(preg_replace('{^\s*<\?(php)?}i', '', $_POST['code']));
+
+    if ( $code ) {
+      array_unshift($history, $code);
+      $history = array_unique($history);
+      $history = array_slice($history,0,10);
+      setcookie('history', serialize($history));
+    }
 
     // if there's only one line wrap it into a krumo() call
     if (preg_match('#^(?!var_dump|echo|print|< )([^\r\n]+?);?\s*$#is', $code, $m) && trim($m[1])) {
@@ -216,8 +213,8 @@ if (isset($_POST['code'])) {
               <?php endforeach; ?>
             </select>
             <div id="history">
-            <?php foreach ( $_SESSION['history'] as $k => $h_code ) : ?>
-              <a href="?js=1&h=<?php print $k; ?>">back <?php print $k; ?></a>
+            <?php foreach ( $history as $k => $h_code ) : ?>
+              <a href="?js=1&h=<?php print $k; ?>"><?php print $k+1; ?> <?php print trim(substr($h_code, 0, 25)); ?>...</a>
             <?php endforeach; ?>
             </div>
           </div>
