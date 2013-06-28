@@ -66,7 +66,7 @@ if (!$current_site && !empty($drupal_sites)){
   $current_site = key($drupal_sites);
 }
 
-if(isset($current_site) && file_exists($current_site)) {
+if(!empty($current_site)) {
   // We must be actually in the root directory of Drupal installation.
   chdir($current_site);
   define('DONSOLE', TRUE);
@@ -75,9 +75,10 @@ if(isset($current_site) && file_exists($current_site)) {
   require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
   drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
   setcookie('current_site', $current_site);
-} else {
-  header('HTTP/1.1 500 Internal Server Error');
-  exit('Requested site cannot be found at ' . $current_site);
+  if(!file_exists($current_site)){
+    print 'Requested site cannot be found at ' . $current_site;
+  }
+  
 }
 
 $history = isset($_COOKIE['history']) ? unserialize($_COOKIE['history']) : array();
