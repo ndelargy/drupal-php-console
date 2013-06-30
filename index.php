@@ -38,6 +38,7 @@ if (is_readable('my.config.json')) {
     print 'Config error in my.config.json';
   }
 }
+var_export($config);
 $drupal_sites = !empty($config['drupal_sites']) ? $config['drupal_sites'] : array();
 $options = !empty($config['options']) ? $config['options'] : array();
 
@@ -73,8 +74,16 @@ if(!empty($current_site)) {
 
   define('DRUPAL_ROOT', getcwd());
   require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
-  drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
-  setcookie('current_site', $current_site);
+  try {
+    drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+    setcookie('current_site', $current_site);
+  }
+  catch(Exception $e) {
+    print $e->getMessage();
+    setcookie('current_site', '');
+  }
+  
+  
   if(!file_exists($current_site)){
     print 'Requested site cannot be found at ' . $current_site;
   }
@@ -207,7 +216,7 @@ if (isset($_POST['code'])) {
           <div id="site-chooser">
             <label for="site-choice"></label>
             <select name="site-choice" id="site-choice">
-              <?php foreach ( $config['drupal_sites'] as $dir => $site ) : ?>
+              <?php foreach ( $drupal_sites as $dir => $site ) : ?>
               <?php $site_selected_option = $dir === $current_site ? ' selected="selected"' : ''; ?>
               <option<?php print $site_selected_option; ?>
                 value="<?php print $dir; ?>"><?php print $site; ?></option>
