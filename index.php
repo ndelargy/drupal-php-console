@@ -38,7 +38,6 @@ if (is_readable('my.config.json')) {
     print 'Config error in my.config.json';
   }
 }
-var_export($config);
 $drupal_sites = !empty($config['drupal_sites']) ? $config['drupal_sites'] : array();
 $options = !empty($config['options']) ? $config['options'] : array();
 
