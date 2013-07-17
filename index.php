@@ -17,6 +17,7 @@ if (!in_array($_SERVER['REMOTE_ADDR'], array('127.0.0.1', '::1'), true)) {
     header('HTTP/1.1 401 Access unauthorized');
     die('ERR/401 Go Away');
 }
+
 ini_set('log_errors', 0);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -74,6 +75,8 @@ if(!empty($current_site)) {
   define('DRUPAL_ROOT', getcwd());
   require_once DRUPAL_ROOT . '/includes/bootstrap.inc';
   try {
+    // We don't want the cached pages fired back at us.
+    $GLOBALS['conf']['cache'] = FALSE;
     drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
     setcookie('current_site', $current_site);
   }
@@ -81,7 +84,6 @@ if(!empty($current_site)) {
     print $e->getMessage();
     setcookie('current_site', '');
   }
-  
   
   if(!file_exists($current_site)){
     print 'Requested site cannot be found at ' . $current_site;
