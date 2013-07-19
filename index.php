@@ -110,9 +110,12 @@ if (isset($_POST['code'])) {
     $code = trim(preg_replace('{^\s*<\?(php)?}i', '', $_POST['code']));
 
     if ( $code ) {
-      array_unshift($history, $code);
+      $t = (int) microtime(true) * 1000000;
+      $history[$t] = $code;
+      krumo($history);
       $history = array_unique($history);
-      $history = array_slice($history,0,10);
+      $history = array_slice($history, 0, 10, TRUE);
+      krumo($history);
       setcookie('history', serialize($history));
     }
 
