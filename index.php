@@ -112,10 +112,8 @@ if (isset($_POST['code'])) {
     if ( $code ) {
       $t = (int) microtime(true) * 1000000;
       $history[$t] = $code;
-      krumo($history);
       $history = array_unique($history);
       $history = array_slice($history, 0, 10, TRUE);
-      krumo($history);
       setcookie('history', serialize($history));
     }
 
