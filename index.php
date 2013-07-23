@@ -77,7 +77,17 @@ if(!empty($current_site)) {
   try {
     // We don't want the cached pages fired back at us.
     $GLOBALS['conf']['cache'] = FALSE;
+    // Multi site set up?
+    $matches = array();
+    if ( preg_match("/.*\[(.*)\].*/", "British Council [grants.bri005.local]", $matches) ) {
+      if (!empty($matches[1]) && is_string($matches[1]))
+      $_SERVER['HTTP_HOST'] = $matches[1];
+    }
     drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+    // let's be user 1
+    $GLOBALS['user'] = user_load(1);
+
+    // Remember which site we are using.
     setcookie('current_site', $current_site);
   }
   catch(Exception $e) {
