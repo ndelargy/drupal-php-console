@@ -79,9 +79,13 @@ if(!empty($current_site)) {
     $GLOBALS['conf']['cache'] = FALSE;
     // Multi site set up?
     $matches = array();
-    if ( preg_match("/.*\[(.*)\].*/", "British Council [grants.bri005.local]", $matches) ) {
-      if (!empty($matches[1]) && is_string($matches[1]))
-      $_SERVER['HTTP_HOST'] = $matches[1];
+    // Check for a portion of the config site alias in square brackets (site
+    // url).
+    if ( preg_match("/.*\[(.*)\].*/", $drupal_sites[$current_site], $matches) ) {
+      if (!empty($matches[1]) && is_string($matches[1])) {
+          // Set the server host variable to the url.
+          $_SERVER['HTTP_HOST'] = $matches[1];
+      }
     }
     drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
     // let's be user 1
@@ -123,6 +127,7 @@ if (isset($_POST['code'])) {
       $t = (int) microtime(true) * 1000000;
       $history[$t] = $code;
       $history = array_unique($history);
+      $history = array_reverse($history, TRUE);
       $history = array_slice($history, 0, 10, TRUE);
       setcookie('history', serialize($history));
     }
@@ -144,7 +149,12 @@ if (isset($_POST['code'])) {
     }
 
     ob_start();
-    eval($code);
+    try {
+      eval($code);
+    }
+    catch(Exception $e) {
+      print $e->getMessage();
+    }
     $debugOutput = ob_get_clean();
 
     if (isset($_GET['js'])) {
