@@ -3,6 +3,8 @@
     "tabsize":2
   },
   "drupal_sites": {
-    "/var/www/mysite":"My Website"
+    "/var/www/mysite":"My Website",
+    "/var/www/mymultisite":"My MulitSite Website [subfolder_name]",
+    "/var/www/mymultisite":"My MulitSite Website [multisite_http_host]"
   }
 }
