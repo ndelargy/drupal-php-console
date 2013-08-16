@@ -14,7 +14,7 @@ It is secure since accessible only from the local host, and very easy to setup a
 Screenshot
 ----------
 
-<img src="http://seld.be/_misc/php-console.png" alt="PHP Console screenshot" border="0" />
+<img src="https://github.com/ndelargy/drupal-php-console/blob/master/screenshot.png?raw=true" alt="PHP Console screenshot" border="0" />
 
 Setup
 -----
