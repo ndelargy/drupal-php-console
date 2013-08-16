@@ -32,6 +32,7 @@ The json value is the site alias.  If you have more than one site in the config,
     "/var/www/mysite":"My Website",
 
 For Windows users this will look something like this:
+
     "c:\\Users\\Me\\www\\mysite":"My Website",
 
 execute variable_get('site_name') in the console to confirm you have the correct
@@ -41,13 +42,16 @@ MultiSite Configuration
 -----------------------
 
 If you're using a Drupal multisite setup:
+
     "/var/www/mymultisite":"My MultiSite Website [subfolder_name]",
     "/var/www/mymultisite":"My MultiSite Website [multisite_http_host]"
 
 > e.g. "/var/www/mymultisite":"My MulitSite Website [my.multisite.local]"
+
 >  *or*  "/var/www/mymultisite":"My MulitSite Website [my]"
 
 *Do not combine* "/var/www/mymultisite":"My MulitSite Website [multisite.local/my]"
+
 *Watch out* for *trailing commas* in your json config.
 
 execute variable_get('site_name') to confirm you have the correct multi site
