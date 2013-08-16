@@ -35,7 +35,7 @@ For Windows users this will look something like this:
     "c:\\Users\\Me\\www\\mysite":"My Website",
 
 execute variable_get('site_name') in the console to confirm you have the correct
-multi site bootstrapped.
+site bootstrapped.
 
 MultiSite Configuration
 -----------------------
