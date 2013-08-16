@@ -1,4 +1,4 @@
-PHP Console
+Drupal PHP Console
 ===========
 
 A web console to try your PHP code into
@@ -9,7 +9,7 @@ Creating a test file or using php's interactive mode can be a bit cumbersome to 
 
 It is secure since accessible only from the local host, and very easy to setup and use.
 
-To install either git clone this repo or using Composer: `composer create-project seld/php-console`.
+@todo: To install either git clone this repo or using Composer: `composer create-project ndelargy/drupal-php-console`. (todo: set this up)
 
 Screenshot
 ----------
@@ -20,8 +20,38 @@ Setup
 -----
 
 Clone the git repo or download it as a zip/tarball, drop it somewhere in your local web document root and access it with http://localhost/path/to/php-console
+Or set it up as a local site.
+Copy rename "example.my.config.json" to "my.config.json" and edit as required
 
-Copy rename "example.my.config.json" to "my.config.json" and edit as required 
+Configuration
+-------------
+
+Add the root path as the json key to the root of you Drupal install. (Where drupal's index.php file sits).
+The json value is the site alias.  If you have more than one site in the config, then this will appear in a drop down.
+
+    "/var/www/mysite":"My Website",
+
+For Windows users this will look something like this:
+    "c:\\Users\\Me\\www\\mysite":"My Website",
+
+execute variable_get('site_name') in the console to confirm you have the correct
+multi site bootstrapped.
+
+MultiSite Configuration
+-----------------------
+
+If you're using a Drupal multisite setup:
+    "/var/www/mymultisite":"My MultiSite Website [subfolder_name]",
+    "/var/www/mymultisite":"My MultiSite Website [multisite_http_host]"
+
+> e.g. "/var/www/mymultisite":"My MulitSite Website [my.multisite.local]"
+>  *or*  "/var/www/mymultisite":"My MulitSite Website [my]"
+
+*Do not combine* "/var/www/mymultisite":"My MulitSite Website [multisite.local/my]"
+*Watch out* for *trailing commas* in your json config.
+
+execute variable_get('site_name') to confirm you have the correct multi site
+bootstrapped.
 
 Contributing
 ------------
@@ -34,7 +64,7 @@ Author
 Jordi Boggiano - <j.boggiano@seld.be><br />
 <http://seld.be/> - <http://twitter.com/seldaek>
 
-Minor amends to the original code to bootstrap Drupal
+Amends to the original code to bootstrap Drupal
 -----------------------------------------------------
 
 Neil Delargy - <n.delargy@ctidigital.com><br />
@@ -44,41 +74,20 @@ Neil Delargy - <n.delargy@ctidigital.com><br />
 Changelog
 ---------
 
-- 1.2.2
-  - Updated ACE to latest version
-  - Added composer.json support
-- 1.2.1
-  - Performance fixes for ACE editor integration
-  - JS is no longer a requirement
-- 1.2.0
-  - Replaced built-in editor with [ACE editor](http://ace.ajax.org/) which provides highlighting and
-    [other features](https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts)
-  - Handle old setups with magic_quotes enabled
-- 1.1.2
-  - Fixed issue with IPv6 loopback not being whitelisted
-- 1.1.1
-  - Cross-browser compatibility enhancements
-- 1.1.0
-  - Script execution is now done via an async js request, preventing die() and exception to mess up the entire console
-  - Added a status bar with char/line display
-  - Added a toggle button to expand/collapse all krumo sub-trees at once
-  - Cross-browser compatibility enhancements
-  - Removing a tab (i.e. 4 spaces) on backspace now
-  - Made tab character(s) configurable (see index.php)
 - 1.0.0
   - Initial Public Release
 
 License
 -------
 
-PHP Console is licensed under the New BSD License, which means you can do pretty much anything you want with it.
+Drupal PHP Console is licensed under the New BSD License, which means you can do pretty much anything you want with it.
 
 New BSD License - see the LICENSE file for details
 
 Acknowledgements
 ----------------
 
-PHP Console bundles the following libraries, and the work of their respective authors is very much appreciated:
+PHP Drupal Console bundles the following libraries, and the work of their respective authors is very much appreciated:
 
 - [krumo](http://krumo.sourceforge.net/) licensed under the LGPL
 - [jQuery](http://jquery.com) licensed under the MIT License
