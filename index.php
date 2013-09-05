@@ -238,6 +238,7 @@ if (isset($_POST['code'])) {
         </div>
         <div class="options">
           <div id="site-chooser" class="site-chooser">
+            <?php if ($drupal_sites) : ?>
             <label for="site-choice">Change Site</label>
             <select name="site-choice" id="site-choice">
               <?php foreach ( $drupal_sites as $dir => $site ) : ?>
@@ -246,6 +247,11 @@ if (isset($_POST['code'])) {
                 value="<?php print $dir; ?>"><?php print $site; ?></option>
               <?php endforeach; ?>
             </select>
+            <?php else: ?>
+            <h4>You need to add a drupal site.</h4>
+            <p>Copy rename "example.my.config.json" to "my.config.json" and edit as required.</p>
+            <p>For further configuration instructions view the <a href=""https://github.com/ndelargy/drupal-php-console#readme">README.md.</a></p>
+            <?php endif; ?>
             <div id="history" class="history">
               <h4>History</h4>
             <?php foreach ( $history as $k => $h_code ) : ?>
