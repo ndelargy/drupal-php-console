@@ -95,7 +95,16 @@ a {
 .footer a {
     color: #aaa;
 }
-
-#history a {
+.options {
+  width: 33%;
+  float: left;
+}
+.history a {
   text-decoration: none;
+  white-space: pre;
+  display: block;
+  margin: 1em 0;
+}
+label {
+  font-weight: bold;
 }

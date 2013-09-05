@@ -236,9 +236,9 @@ if (isset($_POST['code'])) {
             krumo::classes();
             krumo::defines();
         </div>
-        <div class="help">
-          <div id="site-chooser">
-            <label for="site-choice"></label>
+        <div class="options">
+          <div id="site-chooser" class="site-chooser">
+            <label for="site-choice">Change Site</label>
             <select name="site-choice" id="site-choice">
               <?php foreach ( $drupal_sites as $dir => $site ) : ?>
               <?php $site_selected_option = $dir === $current_site ? ' selected="selected"' : ''; ?>
@@ -246,9 +246,10 @@ if (isset($_POST['code'])) {
                 value="<?php print $dir; ?>"><?php print $site; ?></option>
               <?php endforeach; ?>
             </select>
-            <div id="history">
+            <div id="history" class="history">
+              <h4>History</h4>
             <?php foreach ( $history as $k => $h_code ) : ?>
-              <a href="?js=1&h=<?php print $k; ?>"><?php print $k+1; ?> <?php print trim(substr($h_code, 0, 25)); ?>...</a>
+              <a href="?js=1&h=<?php print $k; ?>"><?php print substr(trim($h_code), 0, 45); ?>...</a>
             <?php endforeach; ?>
             </div>
           </div>
