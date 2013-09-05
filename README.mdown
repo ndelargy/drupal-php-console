@@ -18,9 +18,10 @@ Screenshot
 Setup
 -----
 
-# Clone the git repo or download it as a zip/tarball, drop it somewhere in your local web document root and access it with http://localhost/path/to/php-console
+1. Clone the git repo or download it as a zip/tarball, drop it somewhere in your local web document root and access it with http://localhost/path/to/php-console
 >  Or set it up as a local site.
-# Copy rename "example.my.config.json" to "my.config.json" and edit as required
+
+2. Copy rename "example.my.config.json" to "my.config.json" and edit as required
 
 @todo or using Composer: `composer create-project ndelargy/drupal-php-console`.
 
