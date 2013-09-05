@@ -250,7 +250,7 @@ if (isset($_POST['code'])) {
             <?php else: ?>
             <h4>You need to add a drupal site.</h4>
             <p>Copy rename "example.my.config.json" to "my.config.json" and edit as required.</p>
-            <p>For further configuration instructions view the <a href=""https://github.com/ndelargy/drupal-php-console#readme">README.md.</a></p>
+            <p>For further configuration instructions view the <a href="https://github.com/ndelargy/drupal-php-console#readme">README.md.</a></p>
             <?php endif; ?>
             <div id="history" class="history">
               <h4>History</h4>
