@@ -153,6 +153,8 @@ if (isset($_POST['code'])) {
       eval($code);
     }
     catch(Exception $e) {
+      print get_class($e);
+      print '<br />';
       print $e->getMessage();
     }
     $debugOutput = ob_get_clean();
