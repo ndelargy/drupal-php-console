@@ -9,7 +9,6 @@ Creating a test file or using php's interactive mode can be a bit cumbersome to 
 
 It is secure since accessible only from the local host, and very easy to setup and use.
 
-@todo: To install either git clone this repo or using Composer: `composer create-project ndelargy/drupal-php-console`. (todo: set this up)
 
 Screenshot
 ----------
@@ -19,9 +18,11 @@ Screenshot
 Setup
 -----
 
-Clone the git repo or download it as a zip/tarball, drop it somewhere in your local web document root and access it with http://localhost/path/to/php-console
-Or set it up as a local site.
-Copy rename "example.my.config.json" to "my.config.json" and edit as required
+# Clone the git repo or download it as a zip/tarball, drop it somewhere in your local web document root and access it with http://localhost/path/to/php-console
+>  Or set it up as a local site.
+# Copy rename "example.my.config.json" to "my.config.json" and edit as required
+
+@todo or using Composer: `composer create-project ndelargy/drupal-php-console`.
 
 Configuration
 -------------
