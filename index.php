@@ -43,8 +43,6 @@ $drupal_sites = !empty($config['drupal_sites']) ? $config['drupal_sites'] : arra
 $options = !empty($config['options']) ? $config['options'] : array();
 
 define('PHP_CONSOLE_VERSION', '1.3.0-dev');
-require 'krumo/class.krumo.php';
-
 $debugOutput = '';
 
 /**
@@ -91,6 +89,9 @@ if(!empty($current_site)) {
     // let's be user 1
     $GLOBALS['user'] = user_load(1);
 
+    // stop devel adding reams of output on shutdown
+    $GLOBALS['devel_shutdown'] = FALSE;
+
     // Remember which site we are using.
     setcookie('current_site', $current_site);
   }
@@ -104,7 +105,9 @@ if(!empty($current_site)) {
   }
   
 }
-
+if (!class_exists('krumo')) {
+  require 'krumo/class.krumo.php';
+}
 $history = isset($_COOKIE['history']) ? unserialize($_COOKIE['history']) : array();
 
 if (isset($_GET['h'])){
